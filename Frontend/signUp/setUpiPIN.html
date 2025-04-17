@@ -1,0 +1,272 @@
+<!-- // SubmitUpiPin=()=>{
+    //             if(UpiPIN!==UpiPinCopy){
+    //                 this.setState({valueErr:"Re Enter UPI Pin",UpiPIN:"",UpiPinCopy:"",upiCheckStatus:false})
+    //             }
+    //             else{
+    //                 this.setState({valueErr:"",upiCheckStatus:true})
+    //             }
+
+    //         } -->
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>UPI PIN Setup</title>
+        <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+        <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+        <style>
+                     body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: white;
+            text-align: center;
+            padding: 50px;
+        }
+        .container {
+            max-width: 600px;
+            width: 90%;
+            background: #1e1e1e;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            margin: auto;
+            transition: all 0.3s ease;
+        }
+        .container:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+        }
+        .app-logo {
+            width: 100px;
+            margin-bottom: 20px;
+        }
+        input, button {
+            width: 100%;
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: #252525;
+            color: white;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        input:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        button {
+            background: #007bff;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background: #0056b3;
+            transform: scale(1.05);
+        }
+        .upi-pin-container {
+            margin-top: 20px;
+            padding: 20px;
+        }
+        .error {
+            color: #ff4c4c;
+            font-weight: bold;
+        }
+        .app-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: #1e1e1e;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.app-header:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+}
+
+.app-logo {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    margin-bottom: 10px;
+}
+
+.app-name {
+    font-size: 24px;
+    font-weight: bold;
+    color: #007bff;
+}
+
+        </style>
+    </head>
+    <body>
+        <div id="root"></div>
+    
+        <script type="text/babel">
+            class UpiPinSetup extends React.Component {
+                constructor(props) {
+                    super(props);
+                    this.state = {
+                        proceed:false,
+                        upiPin: "",
+                        upiPinCopy: "",
+                        error: "",
+                        isUpiInstanceActive: false,
+                        username:"",
+                        upiID:"",
+                        bankName:"",
+                        AllUserData:{}
+
+                    };
+                }
+    
+                handleChange = (event) => {
+                    this.setState({ [event.target.id]: event.target.value });
+                };
+    
+                handleSubmit = () => {
+                    const { upiPin, upiPinCopy, AllUserData} = this.state;
+                    if (upiPin !== upiPinCopy) {
+                        this.setState({ error: "Re-entered UPI PIN does not match!", upiPin: "", upiPinCopy: "" });
+                    } else {
+                        this.setState({ error: "" });
+                        AllUserData["UpiPIN"] = upiPin
+                        const Path = "/users/signup/createUpiAccount/"
+                        const Options = {
+                            method:"POST",
+                            headers:{
+                                "Content-Type":"application/json"
+                            },
+                            body:JSON.stringify(AllUserData) 
+                        }
+                        fetch(Path,Options)
+                        .then(res=>{
+                            if(res.ok){
+                                return res.json()
+                            }
+                            else{
+                                throw new Error("Failed")
+                            }
+
+                        })
+                        .then(Data=>{
+                            console.log("--> : ",Data)
+                            if(Data.success){
+                            window.location.href="/App/UPI/Create/Success"
+                            }
+                            else if(Data.success===false && Data.message==="UNIQUE constraint failed"){
+                                window.location.href="/app/invalid/mobile"
+                            }
+                        })
+                        .catch(err=>{
+                            console.log("Err : ",err)
+                        })
+                        
+
+
+
+                        //alert("UPI PIN set successfully! 🎉");
+                    }
+                };
+                
+                componentDidMount() {
+                    const Path="/users/getUserData/"
+                    const Options = {
+                        method:"GET"
+                    }
+                    fetch(Path,Options)
+                    .then(res=>{
+                        if(res.ok){
+                            this.setState({proceed:true})
+                            console.log("Data Recived")
+                            return res.json()
+                        }
+                        else{
+                            throw new Error(`Server Down :,${res.json()}`)
+                            
+                        }
+                    })
+                    .then(Data=>{
+                        console.log("Data: ",Data)
+                        const {user} = Data 
+                        const ActualData = user[0] 
+                        const {LastName,FirstName,BankName,BankID} = ActualData
+                        this.setState({AllUserData:ActualData,username:LastName+FirstName,bankName:BankName,upiId:BankID})
+                    })
+                    .catch(err=>{
+                        window.location.href="/invalid/authentication"
+                    })
+                }
+
+    
+                render() {
+                    const {username,bankName,upiId,proceed} = this.state
+                    if(proceed){
+                    return (
+<div>
+    <header class="app-header">
+        <img src="https://lh6.ggpht.com/w8lmlhtTuVcmEEMpeH86ysnffrSD7rmtYR0qCSlLkn94khLN0O54yKT3GesX4A8WMnU%3Dw300" alt="App Icon" class="app-logo"/>
+        <h1 class="app-name">Flowpay</h1>
+    </header>   
+   
+
+                        <div className="container">
+                            <h2>Set Up Your UPI PIN</h2>
+
+                            <img src="https://via.placeholder.com/100" alt="Profile" className="profile-img" />
+                            <h3>{username}</h3>
+                            <p><strong>Bank:</strong> {bankName}</p>
+                            <p><strong>UPI ID:</strong> {upiId}</p>
+
+    
+                            {!this.state.isUpiInstanceActive ? (
+                                <button className="open-btn" onClick={() => this.setState({ isUpiInstanceActive: true })}>
+                                    Set UPI PIN
+                                </button>
+                            ) : (
+                                <div className="upi-pin-container">
+                                    <label>Create UPI PIN</label>
+                                    <input
+                                        type="password"
+                                        id="upiPin"
+                                        value={this.state.upiPin}
+                                        onChange={this.handleChange}
+                                        placeholder="Enter UPI PIN"
+                                    />
+    
+                                    <label>Re-enter UPI PIN</label>
+                                    <input
+                                        type="password"
+                                        id="upiPinCopy"
+                                        value={this.state.upiPinCopy}
+                                        onChange={this.handleChange}
+                                        placeholder="Re-enter UPI PIN"
+                                    />
+    
+                                    {this.state.error && <p className="error">{this.state.error}</p>}
+    
+                                    <button className="submit-btn" onClick={this.handleSubmit}>Submit</button>
+                                </div>
+                            )}
+                        </div>
+                    </div> 
+                    )}
+                    return(<div>
+                        <p className="error">Server Down Try Later</p>
+                        </div>)
+                }
+            }
+            ReactDOM.render(<UpiPinSetup />, document.getElementById("root"));
+        </script>
+    </body>
+    </html>
+    

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPI PIN Entry</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body{
+            padding:0px;
+            margin:0px;
+            box-sizing: border-box;
+            font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        }
+        .Pinbody{
+            display: flex;
+            justify-content: center;
+            background: #080808;
+            padding-top:20px;
+        }
+        .Body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: #080808;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: rgb(233, 245, 254);
+            padding: 10px;
+            border-radius: 15px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+            width: 400px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header img {
+            height: 30px;
+        }
+        .pin-display {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .dot {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #ccc;
+        }
+        .dot.filled {
+            background: black;
+        }
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+            margin-left:25px;
+        }
+        .key {
+            width: 60px;
+            height: 60px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 15px;
+            border: none;
+            background: #ffffff;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-left:20px;
+        }
+        .back-key {
+            width: 160px !important;
+            height: 60px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 15px;
+            border: none;
+            background: #8bb5ff;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-left:28%;
+        }
+        .back-key:hover {
+            background: #01408d;
+            transform:scale(1.1);
+            color:white;
+        }
+        .key:hover {
+            background: #f0f0f0;
+            transform:scale(1.1);
+        }
+        .key.special {
+            background: #dfe4ea;
+        }
+        .key.confirm {
+            background: #4caf50;
+            color: white;
+        }
+        .AppLogoImage {
+    width: 32px;
+    height: 32px;
+    animation: rotateLogo 3s linear infinite;
+    margin-top:30px;
+    margin-right:10px;
+}
+
+@keyframes rotateLogo {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+.flowpay-heading {
+    font-family: 'Poppins', sans-serif; /* Modern & sleek font */
+    font-size: 35px; /* Adjust size as needed */
+    font-weight: 700; /* Bold and premium look */
+    color: #ffffff; /* White text */
+    text-transform: lowercase; /* Matches the 'FlowPay' style */
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Soft shadow for depth */
+}
+
+.upi-button {
+    font-family: 'Poppins', sans-serif;
+    font-size: 8px;
+    font-weight: 600;
+    color: white;
+    background: linear-gradient(145deg, #2a85ff, #1e5cc4); /* Gradient blue */
+    border-radius:2px; /* Rounded button */
+    height:35px;
+    width:35px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    text-align: center;
+   margin-top:30px;
+   margin-left:9px;
+   border:none;
+  
+}
+.tm{
+    font-size:15px;
+    padding-bottom:20px;
+}
+.TOPContainer
+{
+    height:100vh;
+    background-color:black;
+}
+    </style>
+</head>
+<body class="BODY">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        function goBack(){
+            window.location.href="/user/application/open/"
+        }
+        function UpiPinEntry() {
+            const [pin, setPin] = React.useState("");
+            const [error,setError] = React.useState(false)
+            const [transaction,initiateTransaction]=React.useState(false)
+            const handleKeyPress = (value) => {
+                if (value === "backspace") {
+                    setPin(pin.slice(0, -1));
+                    setError(false)
+                } else if (value === "confirm") {
+                    //alert("PIN Entered: " + pin);
+                    const Path = "/upi/transfer/check/pin"
+                    const Options = {
+                        method:"POST",
+                        headers:{
+                            "Content-Type":"application/json"
+                        },
+                        body:JSON.stringify({enteredUpiPIN:pin})
+                    }
+                    fetch(Path,Options)
+                    .then(res=>{
+                        if(res.ok){
+                            return res.json()
+                        }
+                        else{
+                            throw new Error("wrong pin")
+                        }
+                        
+                    }).then(async data=>{
+                            console.log(data)
+                        if(data.pin === false){
+                                setError(true)
+                        }
+                        else{
+                            console.log("data:-",data)
+                            
+                            window.location.href="/app/transaction/status/"
+                           
+                        }
+                    })
+                    .catch(err=>{
+                        console.log("err :  \n   :",err)
+                    })
+
+
+
+
+                } else if (pin.length < 6) {
+                    setPin(pin + value);
+                }
+            };
+
+            return (
+                <div className="TOPContainer">
+                    <div style={{padding:"0px",display:"flex","justify-content":"center","background":"linear-gradient(to bottom right, #121212, #292929)"}}>
+                            <img className="AppLogoImage" src="https://lh6.ggpht.com/w8lmlhtTuVcmEEMpeH86ysnffrSD7rmtYR0qCSlLkn94khLN0O54yKT3GesX4A8WMnU%3Dw300" alt="App"/>
+                            <h1 className="flowpay-heading">FlowPay<span className="tm">™</span></h1>
+                            <button className="upi-button">UPI</button>
+                        </div>
+                        <div className="Pinbody"> 
+                <div className="container">
+                    <div className="header">
+                        <span style={{ fontSize: "18px", fontWeight: "bold" }}>Axis Bank</span>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/3/3b/UPI-Logo-vector.svg" alt="UPI Logo" />
+                    </div>
+                    <p style={{ fontSize: "16px", marginBottom: "10px" }}>ENTER UPI PIN</p>
+                    <div className="pin-display">
+                        {Array(4).fill(null).map((_, index) => (
+                            <div key={index} className={`dot ${index < pin.length ? "filled" : ""}`}></div>
+                        ))}
+                    </div>
+                    <p style={{ color: "red", textAlign: "center" }}>{error ? "Invalid UPI PIN" : ""}</p>
+                    <div className="keypad">
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, "", 0, "backspace"].map((num, index) => (
+                            <button
+                                key={index}
+                                className={`key ${num === "backspace" ? "special" : ""}`}
+                                onClick={() => num !== "" && handleKeyPress(num)}
+                            >
+                                {num === "backspace" ? "⌫" : num}
+                            </button>
+                        ))}
+                    </div>
+                    <button className="key confirm" style={{ width: "90%", marginTop: "20px"}} onClick={() => handleKeyPress("confirm")}>
+                        ✔ Confirm
+                    </button>
+                    <button className="back-key" style={{ width: "100%", marginTop: "20px" }} onClick={()=>goBack()}>Home</button>
+                </div>
+                </div>
+                </div>
+            );        
+        }
+        ReactDOM.createRoot(document.getElementById("root")).render(<UpiPinEntry />);
+  
+  
+  </script>
+</body>
+</html>

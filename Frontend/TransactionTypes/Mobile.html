@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPI Phone Number Entry</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.21.2/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+<style>
+    .UserItem{
+        display:flex;
+    }
+    .userIcon{
+        height:50px;
+        width:50px;
+        border-radius:25px;
+        background-color:rgb(99, 1, 99);
+        color:white;
+        text-align:center;
+    }
+
+    .ToUSerContainer{
+        padding:10px;
+        margin-bottom:20px;
+    }
+    .userIconContainer{
+        display:flex;
+        justify-content:center;
+
+    }
+</style>
+
+</head>
+<body class="bg-gray-900 text-white">
+    <div id="root"></div>
+
+    <script type="text/babel">
+   class UpiPhoneEntry extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            phoneNumber: "",
+            ToUser:{
+                Name:"User Name",
+                PhoneNumber:"00000-00000",
+                BankID:"******@bankname"
+            },
+            triggerUser:false,
+        };
+    }
+    handleInputChange = async (event) => {
+        await this.setState({ phoneNumber: event.target.value });
+        const {phoneNumber} = this.state 
+        if(phoneNumber.length>=10){
+            const Path = "/get/Mobile/User"
+            const Options = {
+                method:"POST",
+                headers:{"Content-Type":"application/json"},
+                body:JSON.stringify({PhoneNumber:phoneNumber})
+            }
+            await fetch(Path,Options)
+            .then(res=>{
+                if(res.ok){
+                    return res.json()
+                }
+                else{
+                    throw new Error("No User")
+                }
+            })
+            .then(async (Data)=>{
+                console.log(Data)
+                if(Data.user !== null){
+                await this.setState({ToUser:Data.user})
+               }
+               else{
+                await this.setState({ToUser:{
+                Name:"User Name",
+                PhoneNumber:"00000-00000",
+                BankID:"******@bankname"
+            }})
+               }
+
+            })
+            .catch(err=>{
+                console.log("ERR:\n   --->  ",err)
+            })
+        }
+    };
+
+    render() {
+        const {ToUser} = this.state 
+        const {Name,PhoneNumber,BankID} = ToUser
+        const recentContacts = [
+            // { name: "Chirag Sharma", phone: "+91 9876 1234" },
+            // { name: "Karishma Choudhary", phone: "+91 8855 3976" },
+            // { name: "Jayashree Mukherjee", phone: "+91 9124 8771" },
+            // { name: "Sik Kaniyapara", phone: "+91 6980 1020" },
+            // { name: "Dinesh Gupta", phone: "+91 7012 8894" }
+        ];
+
+if(this.state.triggerUser===false){
+        return (
+            <div className="max-w-md mx-auto mt-10 p-5 bg-gray-800 rounded-xl shadow-lg">
+                <h2 className="text-xl font-semibold mb-3">Enter a phone number</h2>
+                <p className="text-gray-400 text-sm">Pay any UPI ID using phone number</p>
+
+                <div className="mt-4 flex items-center bg-gray-700 rounded-lg p-3">
+                    <span className="text-lg">🇮🇳 +91</span>
+                    <input 
+                        type="tel" 
+                        placeholder="Enter phone number"
+                        className="ml-3 bg-transparent outline-none text-lg w-full"
+                        value={this.state.phoneNumber}
+                        onChange={this.handleInputChange}
+                    />
+                </div>
+
+                <p className="text-blue-400 text-sm mt-2 cursor-pointer">Sync contacts</p>
+
+                <div className="ToUSerContainer">
+                    
+                    <div className="UserItem">
+                        <div className="userIconContainer">
+                        <h1 className="userIcon">{Name[0]}</h1>
+                        </div>
+                        <div className="info-container">
+                            <h3>{Name}</h3>
+                            <p>{PhoneNumber}</p>
+                        </div>
+                    </div>
+                
+                </div>
+
+                <h3 className="text-lg font-semibold mt-6">Recents</h3>
+                <ul className="mt-2">
+                    {recentContacts.map((contact, index) => (
+                        <li key={index} className="flex items-center py-2 border-b border-gray-700 cursor-pointer hover:bg-gray-700 p-2 rounded-lg">
+                            <div className="w-10 h-10 flex items-center justify-center bg-gray-600 rounded-full text-white text-lg font-semibold">
+                                {contact.name[0]}
+                            </div>
+                            <div className="ml-3">
+                                <p className="text-white">{contact.name}</p>
+                                <p className="text-gray-400 text-sm">{contact.phone}</p>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        );
+}
+if(this.state.triggerUser)    
+{
+    // ......Reneder New Here........ ///
+}
+    }
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<UpiPhoneEntry />);
+
+    </script>
+</body>
+</html>

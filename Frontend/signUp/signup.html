@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - UPI Payment</title>
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: white;
+            text-align: center;
+            padding: 50px;
+        }
+        .container {
+            max-width: 500px;
+            width: 90%;
+            background: #1e1e1e;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            margin: auto;
+            transition: all 0.3s ease;
+        }
+        .container:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+        }
+        input, button {
+            width: 100%;
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: #252525;
+            color: white;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        input:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        button {
+            background: #007bff;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background: #0056b3;
+            transform: scale(1.05);
+        }
+        .profile-pic {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+            margin: auto;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        .profile-pic:hover {
+            transform: scale(1.05);
+        }
+        .file-input {
+            display: none;
+        }
+        .Form {
+            padding: 20px;
+            background: #1e1e1e;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        .PhoneNum-container {
+            padding: 20px;
+        }
+        .Err-Msg {
+            color: #ff4c4c;
+            font-size: 15px;
+            font-weight: bold;
+            font-family: "Roboto", sans-serif !important;
+        }
+        .UpiPinToggeler {
+            box-shadow: 5px 5px 15px rgba(53, 53, 53, 0.5);
+            padding: 20px;
+            background: #252525;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        .UpiPinToggeler:hover {
+            transform: scale(1.03);
+        }
+
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        class SignUp extends React.Component {
+            constructor(props) {
+                super(props);
+                this.state = {
+                    isUserExist:false,
+                    PhoneNumberError:"",
+                    UserID:"",
+                    FirstName:"",
+                    LastName:"",
+                    RegisteredName:"",
+                    Age: "",
+                    City:"",
+                    Address:"",
+                    PhoneNumber:"",
+                    UpiPIN:"",
+                    UpiPinCopy:"",
+                    BankAccountNumber:"",
+                    BankName:"",
+                    BankIFSC:"",
+                    BankBranchLocation:"",
+                    AadhaarNumber: "",
+                    PAN: "",
+                    UpiCredentialNumber: "",
+                    BankID:"",
+                    AccountBalance:"",
+                    valueErr:"",
+                    upiCheckStatus:true
+                };
+                this.UserDATA = null
+            }
+
+            handleChange = (e) => {
+                const { id, value } = e.target;
+                this.setState((prevState) => ({
+                    ...prevState, // Preserve existing state
+                    [id]: value,  // Update only the changed field
+                }));
+            };
+
+            handleImageChange = (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        this.setState({ profilePic: e.target.result });
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+
+            handleSubmit = (e) => {
+                e.preventDefault();
+                console.log("Form Submitted", this.state);
+            };
+
+            updateForm=(data)=>{
+                const userData = data[0]
+                this.UserDATA=userData
+                console.log("at updating form",userData)
+
+            this.setState((prevState) => ({
+                isUserExist: true,  // Ensure this is updated
+                PhoneNumberError: "",
+                ...userData,  // Spread user data to update state
+            }));
+
+            console.log("state:--->",this.state)
+
+                }
+
+            checkUserBankAccount = ()=>{
+                const {PhoneNumber} = this.state 
+                console.log("--->", PhoneNumber)
+                const Path = "/users/signup/checkAccountStatus/"
+                const Options = {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ PhoneNumber:PhoneNumber })
+                        }
+            fetch(Path, Options)
+            .then( res => {
+                if (res.ok) {    
+                return res.json();
+                } 
+                else {
+                throw new Error(`User Does Not Have Bank Account Linked to this Phone Number`);
+                }
+            })
+            .then(async data => {
+                console.log("data:", data);
+                await this.updateForm(data["userData"])
+                this.setState({PhoneNumber:""})
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                this.setState({PhoneNumberError:"Invalid Mobile Number"})
+            });
+
+
+            }
+
+            setUpiPIN = (e) => {
+                console.log("Submit Triggered")
+                const Path = "/users/signup/set/pin"
+                console.log(this.UserDATA)
+                const Options={
+                    method:"POST",
+                    headers:{"Content-Type":"application/json"},
+                    body:JSON.stringify(this.UserDATA)
+                }
+                fetch(Path,Options)
+                .then(res=>{
+                    if(res.ok){
+                        window.location.href = `/user/setPin?userID=${this.state.UserID}&bankID=${this.state.BankID}`;
+                    }
+                    else{
+                        throw new Error("Server Down")
+                    }
+                })
+                .catch(err=>{
+                    console.log("Err:- ",err)
+                })
+
+
+
+            }
+
+
+
+
+
+
+
+
+
+            render() {
+                const {isUserExist,PhoneNumberError,FirstName,LastName,RegisteredName,Age,City,Address,BankName,BankIFSC,AadhaarNumber,UpiPIN} = this.state
+                console.log(this.state) 
+                return (
+                    <div className="container">
+                        <h2>Sign Up</h2>
+                        <img id="profile-pic" className="profile-pic" src="https://lh6.ggpht.com/w8lmlhtTuVcmEEMpeH86ysnffrSD7rmtYR0qCSlLkn94khLN0O54yKT3GesX4A8WMnU%3Dw300" alt="Profile Picture" onClick={() => document.getElementById('file-input').click()} />
+                       
+                        <hr/>
+                        <div className="PhoneNum-container">
+                        <input type="tel" id="PhoneNumber" placeholder="Phone Number" required onChange={this.handleChange} /> 
+                        <p className="Err-Msg">{PhoneNumberError}</p>
+                        
+                        <button onClick={this.checkUserBankAccount} className="PhoneNum-submit-btn">Submit</button>
+                        </div>
+                        <hr/>
+                        <div className="Form">
+                            <input type="text" id="FirstName" value={FirstName} placeholder="First Name" required onChange={this.handleChange} />
+                            <input type="text" id="LastName" value={LastName} placeholder="Last Name" required onChange={this.handleChange} />
+                            <input type="text" id="RegisteredName" value={RegisteredName} placeholder="Registered Name" required onChange={this.handleChange} />
+                            <input type="text" id="Age"  value={Age} onChange={this.handleChange} />
+                            <input type="text" id="City"  value={City} placeholder="City" onChange={this.handleChange} />
+                            <input type="text" id="Address" value={Address} placeholder="Address" onChange={this.handleChange} />
+                            <input type="text" id="BankName"  value={BankName} placeholder="Bank Name" required onChange={this.handleChange} />
+                            <input type="text" id="BankIFSC" value={BankIFSC} placeholder="Bank IFSC" required onChange={this.handleChange} />
+                            <input type="text" id="AadhaarNumber" value={AadhaarNumber} placeholder="Aadhaar Number" required onChange={this.handleChange} />
+                            <button onClick={isUserExist?this.setUpiPIN:undefined}>Sign Up</button>  
+                        </div>
+                    </div>
+                );
+            }
+        }
+
+        ReactDOM.render(<SignUp />, document.getElementById("root"));
+    </script>
+</body>
+</html>

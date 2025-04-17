@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction History</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.22.10/babel.min.js"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: #ddd;
+            margin: 0;
+            padding: 40px;
+            height: 100vh;
+            background: linear-gradient(to right, #0a0f1a, #121d2c, #1b2a42);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+        }
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+           
+            padding: 20px;
+            background: rgba(10, 15, 26, 0.9);
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+        }
+        .app-logo {
+            width: 50px;
+            height: 50px;
+            margin-right: 15px;
+        }
+        .app-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #4f8cff;
+        }
+        .history-container {
+            width: 100%;
+            min-width: 600px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            background-color: rgba(20, 32, 52, 0.9);
+        }
+        .transaction-group {
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            background-color: rgba(30, 50, 80, 0.9);
+        }
+        .transaction-group:hover {
+            transform: scale(1.03);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+        }
+        .transaction {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            color: white;
+        }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+        }
+        .modal-content {
+            background: rgba(25, 45, 75, 0.95);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+        .close-btn {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: #4f8cff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: transform 0.2s ease;
+        }
+        .close-btn:hover {
+            transform: scale(1.1);
+        }
+
+
+    .AppLogoImage {
+    width: 25px;
+    height: 25px;
+    animation: rotateLogo 3s linear infinite;
+    margin-top:22px;
+    margin-right:5px;
+}
+.PartyName{
+    color:rgb(255, 255, 255) !important;
+    font-size:22px;
+}
+strong{
+    color:white !important;
+}
+.profile-initial {
+            width: 35px; /* Adjust size */
+            height: 35px;
+            background-color: #3d4551; /* Dark grayish background */
+            color: white; /* White text */
+            font-weight: bold;
+            font-size: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%; /* Circular shape */
+            text-transform: uppercase;
+            margin-right:10px;
+        }
+
+@keyframes rotateLogo {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+.flowpay-heading {
+    font-family: 'Poppins', sans-serif; /* Modern & sleek font */
+    font-size: 28px; /* Adjust size as needed */
+    font-weight: 700; /* Bold and premium look */
+    color: #ffffff; /* White text */
+    text-transform: lowercase; /* Matches the 'FlowPay' style */
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Soft shadow for depth */
+}
+
+.upi-button {
+    font-family: 'Poppins', sans-serif;
+    font-size: 8px;
+    font-weight: 600;
+    color: white;
+    background: linear-gradient(145deg, #2a85ff, #1e5cc4); /* Gradient blue */
+    border-radius:2px; /* Rounded button */
+    height:5px;
+    width:8px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    padding:12px;
+    padding-left:6px !important;
+    padding-top:6px;
+    margin-top:25px;
+}
+.tm{
+    font-size:20px;
+}
+.amt-display
+{
+    color:rgb(81, 187, 141);
+}
+.name-display{
+    color:rgb(237, 147, 3);
+
+}
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        class TransactionHistory extends React.Component {
+            constructor(props) {
+                super(props);
+                this.state = {
+                    transactions: [],
+                    selectedTransaction: null
+                };
+            }
+
+            componentDidMount = async () => {
+                const PATH = "/get/all/user/transactions"
+                const Options = {
+                    method:"GET"
+                }
+                await fetch(PATH,Options)
+                .then(async res=>{
+                    if(res.ok){
+                        console.log("GOT DATA")
+                        return res.json()
+                    }
+                    else{
+                        throw new Error("Server Down")
+                    }
+                })
+                .then(async Data=>{
+                    console.log(Data)
+                    await this.setState({transactions:Data.transactionData})
+                    console.log(this.state)
+                    const data = Data
+                const sortedTransactions = Data.transactionData.sort((a, b) => new Date(b.DateTime) - new Date(a.DateTime));
+                this.setState({ transactions: data.transactionData });
+                })        
+            }
+
+            handleTransactionClick = (transaction) => {
+                this.setState({ selectedTransaction: transaction });
+            };
+
+            closeModal = () => {
+                this.setState({ selectedTransaction: null });
+            };
+
+            render() {
+                let AMT =""
+                return (
+                    <div className="history-container">
+                        <div style={{ display:"flex","justify-content":"center"}}>
+                            <img className="AppLogoImage" src="https://lh6.ggpht.com/w8lmlhtTuVcmEEMpeH86ysnffrSD7rmtYR0qCSlLkn94khLN0O54yKT3GesX4A8WMnU%3Dw300" alt="App"/>
+                            <h1 className="flowpay-heading">FlowPay<span className="tm">™</span></h1>
+                            <div className="upi-button">UPI</div>
+                        </div>
+                        <h2 style={{ textAlign: "center","font-size":"30px" }}>Transaction History</h2>
+                        {this.state.transactions.map((transaction, index) => (
+                            <div key={index} className="transaction-group" onClick={() => this.handleTransactionClick(transaction)}>
+                                <div className="transaction">
+                                    <div class="profile-initial">{transaction.Party[0]}</div>
+                                    <span className="PartyName"><strong className="PartyName">{transaction.Party}</strong></span>
+                                    <span style={{"margin-left":"auto", color: transaction.Type === "Sent" ? "white" : "green","font-weight":"bold", }}>
+                                        {AMT=transaction.Type==="Sent"?`${transaction.AmountSent}₹`:`+ ${transaction.AmountSent}₹`}
+                                    </span>
+                                </div>
+                                <div>
+                                    <p>{new Date(transaction.DateTime).toLocaleString('en-IN', { 
+                                        day: '2-digit', 
+                                        month: 'short', 
+                                        year: 'numeric', 
+                                        hour: '2-digit', 
+                                        minute: '2-digit', 
+                                        second: '2-digit',
+                                        hour12: true 
+                                    })}</p>
+                                </div>
+                                </div>
+                        ))}
+                        {this.state.selectedTransaction && (
+                            <div className="modal" onClick={this.closeModal}>
+                                <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                                    <h3>Transaction Details</h3>
+                                    <p className="name-display"><strong>Party:</strong> {this.state.selectedTransaction.Party}</p>
+                                    <p><strong>Bank:</strong> {this.state.selectedTransaction.BankName}</p>
+                                    <p className="amt-display"><strong>Amount:</strong> ₹{this.state.selectedTransaction.AmountSent}</p>
+                                    <p><strong>Date:</strong> {new Date(this.state.selectedTransaction.DateTime).toLocaleString()}</p>
+                                    <button className="close-btn" onClick={this.closeModal}>Close</button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                );
+            }
+        }
+        ReactDOM.createRoot(document.getElementById("root")).render(<TransactionHistory />);
+    </script>
+</body>
+</html>

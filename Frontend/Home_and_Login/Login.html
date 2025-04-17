@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowPay | Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            background: #0a0a0a;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .main-container {
+            display: flex;
+            width: 100%;
+            min-width: 1200px;
+            min-height:600px;
+            background: #121212;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        .left-container, .right-container {
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .left-container {
+            background: #1c1c1e;
+            text-align: center;
+        }
+        .right-container {
+            background: #181818;
+        }
+        .flowpay-heading {
+            font-size: 35px;
+            font-weight: 700;
+            text-transform: lowercase;
+            letter-spacing: 1px;
+        }
+        .input-field, button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: none;
+            text-align: center;
+        }
+        .input-field {
+            background: #222;
+            color: white;
+        }
+        button {
+            background: linear-gradient(145deg, #2a85ff, #1e5cc4);
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #1e5cc4;
+        }
+        .features {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            color: #bbb;
+        }
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+        .feature-item i {
+            color: #2a85ff;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        class LoginPage extends React.Component {
+            state = { PhoneNumber: "", UpiPin: "", PinErr: "" };
+            
+            handelChange = (e) => {
+                this.setState({ [e.target.id]: e.target.value, PinErr: "" });
+            };
+            
+            checkUserLogin = () => {
+                const { PhoneNumber, UpiPin } = this.state;
+                console.log("Logging in with", PhoneNumber, UpiPin);
+                const Path="/app/Auth/check/login/"
+                const Options = {
+                    method:"POST",
+                    headers:{
+                        "Content-Type":"application/json"
+                    },
+                    body:JSON.stringify({"PhoneNumber":PhoneNumber,"enteredUpiPIN":UpiPin}) 
+                }
+                fetch(Path,Options)
+                .then(res=>{
+                    if(res.ok){
+                        return res.json()
+                    }
+                    else{
+                        throw new Error("Login Failed")
+                    }
+                })
+                .then(Data=>{
+                    if(Data.status==="Success"){
+                        console.log("UPI PIN CORRECT")
+                        window.location.href="/user/application/open/"
+                    }
+                    else{
+                        throw new Error("UPI PIN is INCORRECT")
+                    }
+                })
+                .catch(async err=>{
+                    console.log("Err:- ",err)
+                    await this.setState({PinErr:"Invalid UPI Pin",PhoneNumber:"",UpiPin:""})
+                })
+            };
+            
+            render() {
+                return (
+                    <div className="main-container">
+                        <div className="left-container">
+                            <h1 className="flowpay-heading">FlowPay™</h1>
+                            <input className="input-field" onChange={this.handelChange} id="PhoneNumber" type="text" placeholder="Mobile Number" />
+                            <input className="input-field" onChange={this.handelChange} id="UpiPin" type="password" placeholder="UPI PIN" />
+                            <p style={{ color: "red", fontSize: "13px" }}>{this.state.PinErr}</p>
+                            <button onClick={this.checkUserLogin}>Sign In</button>
+                        </div>
+                        <div className="right-container">
+                            <h2>Why Use FlowPay?</h2>
+                            <div className="features">
+                                <div className="feature-item"><i class="fas fa-mobile-alt"></i> Send money using mobile number</div>
+                                <div className="feature-item"><i class="fas fa-qrcode"></i> Pay via QR Code scan</div>
+                                <div className="feature-item"><i class="fas fa-wallet"></i> Check your bank balance instantly</div>
+                                <div className="feature-item"><i class="fas fa-lock"></i> Secure and encrypted transactions</div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+        }
+        ReactDOM.render(<LoginPage />, document.getElementById("root"));
+    </script>
+</body>
+</html>

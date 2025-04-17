@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowPay</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            background: #0a0a0a;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        #root {
+            text-align: center;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 50vh;
+            justify-content: center;
+        }
+
+        .app-logo {
+            width: 120px;
+            opacity: 0;
+            transform: scale(0.5) rotate(0deg);
+            animation: logoAppear 2s ease-in-out forwards;
+        }
+
+        @keyframes logoAppear {
+            0% { opacity: 0; transform: scale(0.5) rotate(0deg); }
+            100% { opacity: 1; transform: scale(1.2) rotate(360deg); }
+        }
+
+        .flowpay-heading {
+            font-size: 35px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            display: inline-block;
+            vertical-align: middle;
+            font-family: 'Poppins', sans-serif !important;
+        }
+
+        .tm {
+            font-size: 15px;
+            padding-bottom: 20px;
+        }
+
+        .letter {
+            display: inline-block;
+            opacity: 0;
+            animation: revealLetter 1s forwards;
+        }
+
+        @keyframes revealLetter {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .upi-button {
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            background: linear-gradient(145deg, #2a85ff, #1e5cc4);
+            border-radius: 5px;
+            height: 40px;
+            width: 80px;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .camera-prompt {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            box-shadow: 2px 2px 15px rgba(199, 199, 199, 0.5);
+            width:50%;
+        }
+
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-bar button {
+            padding: 10px 20px;
+            border: none;
+            background: linear-gradient(145deg, #6a11cb, #2575fc);
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .nav-bar button:hover{
+            transform:scale(1.1);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .feature-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .feature-box i {
+            font-size: 30px;
+            color: #4caf50;
+        }
+
+        .feature-box h3 {
+            margin-top: 10px;
+            font-size: 16px;
+        }
+
+        .feature-box p {
+            font-size: 12px;
+            color: #d3d3d3;
+        }
+
+        .info-section {
+            padding: 20px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .camAxcessBtns{
+            font-weight: 600;
+            color: white;
+            background: linear-gradient(145deg, #0164e5, #013899);
+            border-radius: 5px;
+            height: 30px;
+            width: 90px;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+            margin:10px;
+        }
+        .camBlockBtns{
+            font-weight: 600;
+            color: rgb(7, 0, 0);
+            background: linear-gradient(145deg, #fcfcfd, #bed5fd);
+            border-radius: 5px;
+            height: 30px;
+            width: 90px;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+            margin:10px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script type="text/babel">
+    class HomePage extends React.Component {
+        constructor(props) {
+            super(props);
+            this.state = { showCameraPrompt: true };
+
+        }
+        
+
+        allowCamera = () => {
+            this.setState({ showCameraPrompt: false });
+        };
+
+        render() {
+            return (
+                <div>
+                    <NavBar />
+                    <LogoAnimation />
+                    {this.state.showCameraPrompt ? (
+                        <div style={{display:"flex","justify-content":"center"}}>
+                        <div className="camera-prompt">
+                            <p>FlowPay needs camera access</p>
+                            <button className="camAxcessBtns" onClick={this.allowCamera}>Allow</button>
+                            <button className="camBlockBtns">Block</button>
+                        </div>
+                        </div>
+                    ) : (
+                        <MainContent />
+                    )}
+                </div>
+            );
+        }
+    }
+
+    function NavBar() {
+        const login = () => {
+                 window.location.href="/app/login/signup"
+                }
+           const signup = () =>{
+                window.location.href="/app/users/signup"
+                }
+        return (
+            <div className="nav-bar">
+                <button onClick={()=>login()}>Login</button>
+                <button onClick={()=>signup()}>Sign Up</button>
+            </div>
+        );
+    }
+
+    function LogoAnimation() {
+        return (
+            <div className="app-container">
+                <img 
+                    className="app-logo" 
+                    src="https://lh6.ggpht.com/w8lmlhtTuVcmEEMpeH86ysnffrSD7rmtYR0qCSlLkn94khLN0O54yKT3GesX4A8WMnU%3Dw300" 
+                    alt="FlowPay Logo"
+                />
+                <h1 className="flowpay-heading">
+                    {Array.from("FlowPay").map((letter, index) => (
+                        <span key={index} className="letter" style={{ animationDelay: `${index * 0.2}s`,"font-family": "'Poppins', sans-serif" }}>
+                            {letter}
+                        </span>
+                    ))}
+                    <span className="tm">™</span>
+                </h1>
+                <button className="upi-button">UPI</button>
+            </div>
+        );
+    }
+
+    function MainContent() {
+        return (
+            <div>
+                <FeatureSection />
+                <InfoSection />
+            </div>
+        );
+    }
+
+    function FeatureSection() {
+        return (
+            <div className="features">
+                <div className="feature-box">
+                    <i className="fas fa-mobile-alt"></i>
+                    <h3>Mobile Transfers</h3>
+                    <p>Send money instantly using mobile numbers.</p>
+                </div>
+                <div className="feature-box">
+                    <i className="fas fa-qrcode"></i>
+                    <h3>QR Code Payments</h3>
+                    <p>Scan and pay securely using QR codes.</p>
+                </div>
+                <div className="feature-box">
+                    <i className="fas fa-wallet"></i>
+                    <h3>Check Balance</h3>
+                    <p>View your account balance in real-time.</p>
+                </div>
+                <div className="feature-box">
+                    <i className="fas fa-university"></i>
+                    <h3>UPI ID Transfers</h3>
+                    <p>Send and receive money with UPI ID.</p>
+                </div>
+            </div>
+        );
+    }
+
+    function InfoSection() {
+        return (
+            <div className="info-section">
+                <h2>About FlowPay</h2>
+                <p>FlowPay makes digital payments seamless and secure.</p>
+            </div>
+        );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<HomePage />);
+</script>
+
+</body>
+</html>

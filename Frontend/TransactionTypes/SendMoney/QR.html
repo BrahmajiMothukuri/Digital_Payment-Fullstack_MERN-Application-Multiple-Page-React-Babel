@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>QR Code Scanner</title>
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+
+    <style>
+           .Body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to bottom right, #121212, #292929);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            width: 60%;
+            max-width:600px !important;
+            background: #1e1e1e;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .header {
+            font-size: 22px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .input-box {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #444;
+            border-radius: 8px;
+            background: #2b2b2b;
+            color: white;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            background: #4f46e5;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .btn:hover {
+            background: #3b3bb3;
+        }
+
+        .profile-card {
+            text-align: center;
+            padding: 20px;
+            background: #2b2b2b;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .profile-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+        .ToUserContainer{
+            display:flex;
+            margin:10px;
+            margin-top:20px;
+            margin-bottom:20px;
+        }
+        .page-container {
+            display: flex;
+            justify-content: center;
+           
+            width: 100%;
+            background-color: #000;
+            color: #fff;
+            text-align: center;
+            padding:15px;
+        }
+        .TOPContainer{
+            height:100VH;
+        } 
+        .profile-card {
+            width: 75%;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.2);
+            border:solid 1px;
+            border-color:gray;
+        }
+
+        .profile-pic {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+            border: 2px solid white;
+        }
+
+        .user-fullname {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .bank-info, .contact-number, .join-date {
+            font-size: 14px;
+            opacity: 0.8;
+            margin: 4px 0;
+        }
+
+        .greeting-text {
+            font-size: 16px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .action-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .pay-btn {
+            background: #4a90e2;
+            color: white;
+            width:190px;
+        }
+
+        .back-btn {
+            background: #31363b;
+            color: white;
+        }
+        .main-back-btn {
+            background: #31363b;
+            color: white;
+            margin-top:20px;
+        }
+
+        .action-btn:hover {
+            opacity: 0.8;
+        }
+
+        .message-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 5px;
+            margin-top: 10px;
+            width: 60% !important;
+            margin-left:20%;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 20px;
+            background: transparent;
+            color: white;
+            outline: none;
+        }
+
+        .send-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: white;
+            padding: 5px 10px;
+        }
+        .img-container{
+            display:flex;
+            justify-content:center;
+            margin-top:10%;
+        }
+    .AppLogoImage {
+    width: 30px;
+    height: 30px;
+    animation: rotateLogo 3s linear infinite;
+    margin-top:30px;
+    margin-right:10px;
+}
+
+@keyframes rotateLogo {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+.flowpay-heading {
+    font-family: 'Poppins', sans-serif; /* Modern & sleek font */
+    font-size: 35px; /* Adjust size as needed */
+    font-weight: 700; /* Bold and premium look */
+    color: #ffffff; /* White text */
+    text-transform: lowercase; /* Matches the 'FlowPay' style */
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Soft shadow for depth */
+}
+
+.upi-button {
+    font-family: 'Poppins', sans-serif;
+    font-size: 8px;
+    font-weight: 600;
+    color: white;
+    background: linear-gradient(145deg, #2a85ff, #1e5cc4); /* Gradient blue */
+    border-radius:2px; /* Rounded button */
+    height:35px;
+    width:35px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    text-align: center;
+   margin-top:30px;
+   margin-left:9px;
+   border:none;
+
+  
+}
+.tm{
+    font-size:15px;
+    padding-bottom:20px;
+}
+.scanner-container{
+    width:40%;
+
+}
+.SCAN-PAGE-CONTAINER{
+    display:flex;
+    justify-content:center;
+    margin:20px;
+    margin-bottom:40px;
+}
+body{
+    background-color:black;
+    color:white;
+}
+input[type="file"] {
+    appearance: none;
+    background: rgb(7, 5, 5);
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 5px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+input[type="file"]::-webkit-file-upload-button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+input[type="file"]::-webkit-file-upload-button:hover {
+    background: #0056b3;
+}
+.scanBUTTON{
+    background: #fe9501;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        class QRCodeScanner extends React.Component {
+            constructor(props) {
+                super(props);
+                this.state = { isCameraActive: false ,gotUserData:false,UserData:{},QrPhoneNumber:"",
+                 TransferAmount:"",
+                ToUser:{},
+                AccountHolder:{}
+                ,qrImageLoaded:true,
+            };
+                this.scanner = null;
+
+            }
+            componentDidUpdate(prevProps, prevState) {
+                if (this.state.gotUserData && !prevState.gotUserData) {
+                    const qrCanvas = document.getElementById("qr-canvas-visible");
+                    if (qrCanvas) {
+                        qrCanvas.style.display = "none"; // Hide the canvas
+                    }
+                }
+            }
+
+
+            componentDidMount= async () => {
+                this.initScanner();
+            }
+
+            componentWillUnmount() {
+                this.stopCamera();
+            }
+
+            getUserDetails = async () => {
+                const { QrPhoneNumber } = this.state;
+                const Path = "/get/Mobile/User";
+                const Options = {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ PhoneNumber: QrPhoneNumber })
+                };
+
+                try {
+                    const response = await fetch(Path, Options);
+                    if (!response.ok) {
+                        throw new Error("No User Found");
+                    }
+
+                    const Data = await response.json();
+                    console.log(Data);
+                    if(Data.user !== null){
+                                await this.setState({ToUser:Data.user,gotUserData:true,AccountHolder:Data.AccountHolder})
+                                console.log("==>got res==>",this.state)
+                        }
+                    else{
+                        await this.setState({ToUser:{
+                        Name:"!",
+                        PhoneNumber:"Ivalid Number",
+                        BankID:"No UPI User"
+                        }})
+                    }
+                    
+                } catch (err) {
+                    console.error("Error fetching user details:", err);
+                }
+            };
+
+
+            addAmount = async () => {
+               const isNumericExceptDot = (str) => {
+                    return /^[0-9]+(\.[0-9]+)?$/.test(str);
+                 };
+
+               
+                const {TransferAmount,ToUser,AccountHolder} = this.state 
+                const AccHolder = AccountHolder
+                
+                const transactionCredentials = {
+                    "TransferAmount":TransferAmount,
+                    "ToUser":ToUser,
+                    "FromUser":AccHolder
+                }
+                console.log(transactionCredentials)
+                if(isNumericExceptDot(TransferAmount)){
+                    console.log("String rules satisfied")
+                    if(AccHolder["AccountBalance"]>=parseFloat(TransferAmount)){
+                        console.log("Balance Rule Satisifies")
+                        const Path = "/app/start/transaction"
+                        const Options = {
+                            method:"POST",
+                            headers:{
+                                "Content-Type":"application/json"
+                            },
+                            body:JSON.stringify(transactionCredentials)
+                        }
+                                
+                                await fetch(Path,Options)
+                                .then(res=>{
+                                    if(res.ok){
+                                        console.log("Transaction Started")
+                                        return res.json()
+                                    }
+                                    else{
+                                        throw new Error("Server Down")
+                                    }
+                                })
+                                .then(data=>{
+                                    console.log(data)
+                                    window.location.href="/upi/transfer/enter/pin"
+                                })
+                                .catch(err=>{
+                                    console.log("Errr:-\n  --> ",err)
+                                })
+
+                            }
+                            else{
+                                await this.setState({amountError:"Insufficient Account Balance"})
+                            }
+                        }
+                        else{
+                            await this.setState({amountError:"Enter Right Value"})
+                        }
+                    
+                    }
+
+
+            initScanner = () => {
+                try {
+                    this.scanner = new Html5Qrcode("reader");
+                    this.startCamera();
+                } catch (error) {
+                    console.error("Error initializing scanner:", error);
+                }
+            };
+
+            onScanSuccess = async (decodedText) => {
+                let jsonData;
+                try {
+                    jsonData = JSON.parse(decodedText);
+                } catch (error) {
+                    console.warn("Scanned QR Code does not contain valid JSON. Sending as plain text.");
+                    jsonData = { rawText: decodedText };
+                    const DATA = jsonData.rawText.split(":");
+                    if (DATA.length > 2) {
+                        let filter1 = DATA[2].split(" ");
+                        if (filter1.length > 1) {
+                            let filter2 = filter1[1].split("\n");
+                            const PhoneNumber = filter2[0];
+                            console.log("===>", PhoneNumber);
+                            await this.setState({QrPhoneNumber:PhoneNumber,gotUserData:true})
+                            await this.getUserDetails(this.state.QrPhoneNumber)
+                        }
+                    }
+                }
+                console.log("Scanned Data:", jsonData);
+            };
+
+            startCamera = () => {
+                if (this.scanner) {
+                    this.scanner.start(
+                        { facingMode: "environment" },
+                        { fps: 10, qrbox: 250 },
+                        this.onScanSuccess
+                    ).then(() => {
+                        this.setState({ isCameraActive: true });
+                    }).catch(error => console.error("Live Scan Error:", error));
+                }
+            };
+
+            stopCamera = () => {
+                if (this.state.isCameraActive && this.scanner) {
+                    this.scanner.stop().then(() => {
+                        this.setState({ isCameraActive: false });
+                        console.log("Camera stopped.");
+                    }).catch(error => console.error("Error stopping camera:", error));
+                }
+            };
+
+            scanQRCodeFromFile = () => {
+                const fileInput = document.getElementById("qr-file-input");
+                if (fileInput.files.length === 0) {
+                    alert("Please select an image file containing a QR code.");
+                    return;
+                }
+                const file = fileInput.files[0];
+                this.stopCamera();
+                setTimeout(() => {
+                    if (this.scanner) {
+                        this.scanner.scanFile(file, true)
+                            .then(decodedText => {
+                                console.log("Scanned from file:");
+                                this.onScanSuccess(decodedText);
+                                this.startCamera();
+                            })
+                            .catch(error => {
+                                console.error("Error scanning file:", error);
+                                alert("Failed to scan QR code from file.");
+                                this.startCamera();
+                            });
+                    }
+                }, 500);
+            };
+
+            enterAmount = async (event)=>{
+                await this.setState({TransferAmount:event.target.value})
+            }
+            render() {
+    const { gotUserData, ToUser, qrImageLoaded } = this.state;
+
+    if (!gotUserData) {
+        return (
+            <div>
+                <div>
+                    <div style={{ padding: "20px", display: "flex", justifyContent: "center", background: "linear-gradient(to bottom right, #121212, #292929)" }}>
+                    <img className="AppLogoImage" src="https://lh6.ggpht.com/w8lmlhtTuVcmEEMpeH86ysnffrSD7rmtYR0qCSlLkn94khLN0O54yKT3GesX4A8WMnU%3Dw300" alt="App" />
+                    <h1 className="flowpay-heading">FlowPay<span className="tm">™</span></h1>
+                    <button className="upi-button">UPI</button>
+                    </div>
+                </div>
+                <h1 style={{"text-align":"center","font-family":"Roboto"}}>QR Code Scanner</h1>
+            <div className="SCAN-PAGE-CONTAINER">
+                <div id="reader" className="scanner-container"></div>
+            </div>
+            <div className="SCAN-PAGE-CONTAINER">
+                <input type="file" id="qr-file-input" accept="image/*" />
+                <button className="scanBUTTON" onClick={this.scanQRCodeFromFile}>Scan QR Code from File</button>
+            </div> 
+            </div>
+        );
+    } else {
+        if (!ToUser) {
+            return <h2>Loading...</h2>;
+        }
+
+        const { Name, PhoneNumber, BankingName } = ToUser;
+
+        return (
+            <div className="TOPContainer" style={{ background: "black" }}>
+                <div style={{ padding: "20px", display: "flex", justifyContent: "center", background: "linear-gradient(to bottom right, #121212, #292929)" }}>
+                    <img className="AppLogoImage" src="https://lh6.ggpht.com/w8lmlhtTuVcmEEMpeH86ysnffrSD7rmtYR0qCSlLkn94khLN0O54yKT3GesX4A8WMnU%3Dw300" alt="App" />
+                    <h1 className="flowpay-heading">FlowPay<span className="tm">™</span></h1>
+                    <button className="upi-button">UPI</button>
+                </div>
+                
+                {/* QR Code Section */}
+                <div style={{ textAlign: "center", margin: "20px 0" }}>
+                    {!qrImageLoaded && <h3>Loading QR Code...</h3>}
+                </div>
+
+                <div className="page-container">
+                    <div className="profile-card">
+                        <div className="img-container">
+                            <img className="profile-pic" src="" alt="Profile" />
+                        </div>
+                        <h2 className="user-fullname">{Name}</h2>
+                        <p className="bank-info">Banking name: <strong>{BankingName}</strong></p>
+                        <p className="contact-number">{PhoneNumber}</p>
+                        <p className="join-date">Joined March 2025</p>
+                        <p className="greeting-text">Easy “Pay..! 👋”</p>
+                        <div className="button-group">
+                            <button onClick={this.addAmount} className="action-btn pay-btn">Pay</button>
+                            <button onClick={() => this.setState({ gotUserData: false })} className="action-btn back-btn">Back</button>
+                        </div>
+                        <div className="message-container">
+                            <input type="text" className="message-input" placeholder="Message..." onChange={this.enterAmount}/>
+                            <button className="send-btn">➤</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+}
+
+       
+        }
+
+        ReactDOM.render(<QRCodeScanner />, document.getElementById("root"));
+    </script>
+</body>
+</html>

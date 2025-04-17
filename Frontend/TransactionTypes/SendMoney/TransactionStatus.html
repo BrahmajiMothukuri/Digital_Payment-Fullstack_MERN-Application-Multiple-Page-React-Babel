@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction Successful</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg,rgb(120, 180, 249), #005daf, #00235b);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 10px;
+            overflow: hidden;
+        }
+        .container {
+            background: #fff;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            position: relative;
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .gif-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .gif-container img {
+            width: 200px;
+            height: auto;
+            border-radius: 10px;
+        }
+        .success-icon {
+            font-size: 60px;
+            color: #2ecc71;
+            animation: pop 0.5s ease-in-out;
+        }
+        @keyframes pop {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        h2 {
+            font-size: 28px;
+            color: #333;
+            font-weight: 700;
+        }
+        .amount {
+            font-size: 36px;
+            font-weight: 800;
+            color: #004e92;
+            margin-top: 10px;
+            text-shadow: 0 0 10px rgba(0, 78, 146, 0.5);
+        }
+        .details {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+        .details p {
+            margin: 8px 0;
+            font-size: 16px;
+            color: #444;
+        }
+        .highlight {
+            font-weight: bold;
+            color: #004e92;
+        }
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                padding: 30px;
+            }
+            .amount {
+                font-size: 28px;
+            }
+            .details p {
+                font-size: 14px;
+            }
+        }
+        .backButton{
+            height:40px;
+            width:120px;
+            border-radius:10px;
+            border:none; 
+            box-shadow:0px 0px 10px rgb(177, 177, 245);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        class TransactionSuccess extends React.Component {
+            constructor(props) {
+                super(props);
+                this.state = {
+                    showGif: true,
+                    gotData:false,
+                    dataTime:"",
+                    DataErr:"",
+                    TransactionData:{
+  FromUserMobile: '',
+  FromUserRegisteredName: '',
+  ToPersonMobile: '',
+  ToPersonRegisteredName: '',
+  TransactionId: '',
+  FromBankName: '',
+  FromBankId: '',
+  ToBankName: '',
+  ToBankId: '',
+  Amount: '',
+  PaymentStatus: ''
+},
+
+                };
+            }
+           async componentDidMount() {
+                const getFormattedDateTime=()=>{
+                        const now = new Date();
+                        const options = { day: '2-digit', month: 'short', year: 'numeric' };
+                        const date = now.toLocaleDateString('en-GB', options); // Example: 25 Feb 2025
+
+                        const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
+                        const time = now.toLocaleTimeString('en-US', timeOptions); // Example: 10:30 AM
+
+                        return `${date}, ${time}`;
+                    }
+
+                setTimeout(() => {
+                    this.setState({ showGif: false });
+                }, 2000);
+
+                const Path="/app/get/transaction/details"
+                const Options = {
+                    method:"GET"
+                }
+                await fetch(Path,Options)
+                .then(res=>{
+                    if(res.ok){
+                        return res.json()
+                    }
+                    else{
+                        throw new Error("Error While Getting Transaaction Info")
+                    }
+                })
+                .then(async Data =>{
+                    const resData = Data
+                    if(Object.keys(Data["transactionData"]).length !==0 ){
+                        this.setState({TransactionData:Data["transactionData"],gotData:true})
+                        const DataTime = getFormattedDateTime()
+                        this.setState({dataTime:DataTime})
+                    }
+                    else{
+                        await this.setState({DataErr:"Transaction Completed(...Loading)"})
+                    }
+                })
+
+
+
+            }
+            render() {
+                const {DataErr,dataTime,TransactionData} = this.state
+                const {
+            FromUserMobile,
+            FromUserRegisteredName,
+            ToPersonMobile,
+            ToPersonRegisteredName,
+            TransactionId,
+            FromBankName,
+            FromBankId,
+            ToBankName,
+            ToBankId,
+            Amount,
+                } = TransactionData
+                if(this.state.gotData){
+                return (
+                    <div className="container">
+                        {this.state.showGif ? (
+                            <div className="gif-container">
+                                <img src="https://i.pinimg.com/originals/35/f3/23/35f323bc5b41dc4269001529e3ff1278.gif" alt="Success GIF" />
+                            </div>
+                        ) : (
+                            <>
+                                <div className="success-icon">✅</div>
+                                <h2>Transaction Successful</h2>
+                                <p className="amount">₹<strong>{Amount}</strong> Transferred</p>
+                                <div className="details">
+                                    <p><span className="highlight">Recipient Name:</span> {ToPersonRegisteredName}</p>
+                                    <p><span className="highlight">UPI ID:</span> {ToBankId}</p>
+                                    <p><span className="highlight">Bank Name:</span>{ToBankName}</p>
+                                    <p><span className="highlight">Transaction ID:</span> {TransactionId}</p>
+                                    <p><span className="highlight">Date & Time:</span>{dataTime}</p>
+                                </div>
+                                <a href="/user/application/open/"><button className="backButton">Back</button></a>
+                            </>
+                        )}
+                    </div>
+                );
+                }
+                return (<p>{DataErr}</p>)
+            }
+        }
+        ReactDOM.createRoot(document.getElementById("root")).render(<TransactionSuccess />);
+    </script>
+</body>
+</html>

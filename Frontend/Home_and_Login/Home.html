@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPI Payment App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #0a0a0a;
+            color: white;
+        }
+        .app-container {
+            
+            padding: 0;
+            background: #121212;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            
+        }
+        .header {
+            background: #00438b;
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: bold;
+            border-bottom: 2px solid #007bff;
+        }
+        .nav-menu {
+            display: flex;
+            gap: 20px;
+            font-size: 18px;
+        }
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease-in-out;
+        }
+        .nav-menu a:hover {
+            color: #00aaff;
+        }
+        .Menu-Section {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: center;
+            gap: 25px;
+            width: 100%;
+            padding: 20px;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            padding: 20px;
+            max-width: 500px;
+            text-align: center;
+        }
+        .grid-item {
+            background: #1e1e1e;
+            width: 140px;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease-in-out, background 0.3s ease;
+            cursor: pointer;
+        }
+        .grid-item:hover {
+            transform: scale(1.1);
+            background: #292929;
+        }
+        .grid-item i {
+            font-size: 35px;
+            margin-bottom: 5px;
+            color: #00aaff;
+        }
+        .invite-section {
+            background: #080707;
+            padding: 25px;
+            text-align: center;
+            border-top: 1px solid #292929;
+        }
+        .invite-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 18px;
+            transition: all 0.3s ease-in-out;
+        }
+        .invite-btn:hover {
+            background: #0056b3;
+            transform: scale(1.1);
+        }
+        .userInfoDisplyContainer {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            box-shadow: 5px 5px 15px rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            background-color: #1e1e1e;
+            width:100%;
+            padding-left:20px;
+            padding-right:20px;
+        }
+        .profileIcon {
+            text-align: center;
+            font-size: 40px;
+            height: 65px;
+            width: 65px;
+            border-radius: 50%;
+            box-shadow: 2px 2px 8px rgba(255, 255, 255, 0.2);
+            background-color: #00aaff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .userName {
+            font-size: 24px;
+            font-weight: bold;
+            margin-left: 15px;
+        }
+        .logout-btn {
+            height: 48px;
+            border: none;
+            border-radius: 5px;
+            background-color: #ff5500;
+            box-shadow: 5px 5px 10px rgba(255, 85, 0, 0.3);
+            width: 150px;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            transition: all 0.3s ease-in-out;
+        }
+        .logout-btn:hover {
+            transform: scale(1.1);
+            background-color: #e64a00;
+        }
+        .carouselImage {
+            width: 95%;
+            height: 320px;
+            margin: auto;
+            border-radius: 10px;
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        .images-container {
+            padding: 15px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border:dotted 1px #555;
+            justify-content: center;
+            width: 40%;
+        }
+        @media (max-width: 768px) {
+            .Menu-Section {
+                flex-direction: column;
+            }
+            .grid-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .userInfoDisplyContainer {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+        .section-title{
+          margin-left:20px;
+        }
+        .main-loader-container {
+            display: flex;
+            flex-direction:column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #060606;
+            margin: 0;
+        }
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-top-color:rgb(135, 191, 255);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+      
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+ 
+  <script type="text/babel">
+    class UpiPaymentApp extends React.Component {
+    state={
+      profileCheck:false,
+      isProfileImageUploded:false,
+      UserDetails:{},
+      isLoggedIn:false,
+      Time:0,
+      featureTriggered:false,
+      Features:{
+        isCheckBalanceTriggered:false,
+      },
+      currentImageIndex : 0,
+      currentImage:"https://assets.mspimages.in/gear/wp-content/uploads/2023/02/How-to-Link-Credit-Card-to-UPI-1536x807.png",
+      images : [
+      "https://assets.mspimages.in/gear/wp-content/uploads/2023/02/How-to-Link-Credit-Card-to-UPI-1536x807.png",
+      "https://images.tv9bangla.com/wp-content/uploads/2024/01/UPI-News.jpg",
+      "https://st.adda247.com/https://wpassets.adda247.com/wp-content/uploads/multisite/sites/5/2023/08/11222820/upi_digital_payments_december_2022_twitter_1672677890134.jpg",
+      "https://akm-img-a-in.tosshub.com/lingo/ktak/images/story/202308/upi_payment-sixteen_nine.jpg"
+    ],
+    count:0,
+    }
+   
+    componentDidMount(){
+      this.interval = setInterval(() => {
+    this.setState((prevState) => {
+      let newCurrentImageIndex = prevState.currentImageIndex + 1;
+      if (newCurrentImageIndex >= prevState.images.length) {
+        newCurrentImageIndex = 0;
+      }
+      return {
+        count: prevState.count + 1,
+        currentImageIndex: newCurrentImageIndex,
+        currentImage: prevState.images[newCurrentImageIndex]
+      };
+    });
+  }, 2800);
+      const Path = "/app/user/get/details"
+      const Options = {
+        method:"GET"
+      }
+      fetch(Path,Options)
+      .then(res=>{
+        if(res.status===200){
+          return res.json()
+        }
+        if(res.status===404){
+          window.location.href="/app/unAuthorized"
+        }
+        else{
+          throw new Error("Error While Logging IN")
+        }
+      })
+      .then(Data=>{
+        console.log("Got Data: ",Data)
+        const User = Data.userData
+        let interval
+        console.log("Got Data: ",User[0])
+       
+        interval = setInterval(() => {
+          }, 5000);
+          
+          setTimeout(() => {
+              clearInterval(interval);
+              this.setState({isLoggedIn:true,UserDetails:User[0],Time:3})
+              console.log("Stopped");
+          }, 1800);
+
+        // this.setState({isLoggedIn:true,UserDetails:User[0]})
+      })
+      .catch(err=>{
+        console.log("Err : \n",err)
+      })
+     
+
+      
+    }
+    
+    UpiPinEntry = () => {
+        const [pin, setPin] = React.useState("");
+
+        const handleKeyPress = (value) => {
+          if (value === "backspace") {
+              setPin(pin.slice(0, -1));
+          } else if (value === "confirm") {
+              //alert("PIN Entered: " + pin);
+              const Path = "/app/user/check/pin"
+              const Options = {
+                  method:"POST",
+                  headers:{
+                      "Content-Type":"application/json"
+                  },
+                  body:JSON.stringify({enteredUpiPIN:pin})
+              }
+              fetch(Path,Options)
+              .then(res=>{
+                  if(res.ok){
+                      return res.json()
+                  }
+                  else{
+                      throw new Error("wrong pin")
+                  }
+                  
+              }).then(data=>{
+                  console.log(data)
+              })
+              .catch(err=>{
+                  console.log("err :  \n   :",err)
+              })
+
+
+
+
+          } else if (pin.length < 6) {
+              setPin(pin + value);
+          }
+      };
+        const goBack = async ()=>{
+                  await this.setState({featureTriggered:false})
+                }
+         return (
+          <div className="Body">
+          <div className="container">
+              <div className="header">
+                  <span style={{ fontSize: "18px", fontWeight: "bold" }}>Axis Bank</span>
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/3/3b/UPI-Logo-vector.svg" alt="UPI Logo" />
+              </div>
+              <p style={{ fontSize: "16px", marginBottom: "10px" }}>ENTER UPI PIN</p>
+              <div className="pin-display">
+                  {Array(6).fill(null).map((_, index) => (
+                      <div key={index} className={`dot ${index < pin.length ? "filled" : ""}`}></div>
+                  ))}
+              </div>
+              <div className="keypad">
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, "", 0, "backspace"].map((num, index) => (
+                      <button
+                          key={index}
+                          className={`key ${num === "backspace" ? "special" : ""}`}
+                          onClick={() => num !== "" && handleKeyPress(num)}
+                      >
+                          {num === "backspace" ? "⌫" : num}
+                      </button>
+                  ))}
+              </div>
+              <button className="key confirm" style={{ width: "90%", marginTop: "20px" }} onClick={() => handleKeyPress("confirm")}>
+                  ✔ Confirm
+              </button>
+              <button className="back-btn" style={{ width: "100%", marginTop: "20px" }} onClick={() => goBack()}>
+                 Back
+              </button>
+          </div>
+           </div>
+        );
+  
+         }
+
+
+
+
+
+
+    goBack = async ()=>{
+      await this.setState({featureTriggered:false})
+    }
+    checkBalance = async (Path)=>{
+      // await this.setState({featureTriggered:true})
+      // console.log(this.state)
+      window.location.href="/app/user/check/balance"
+    }
+    
+    checkTransactionHistory = () => {
+      window.location.href="/app/transaction/history"
+    }
+
+    ToMobile = async(Path)=>{
+        window.location.href="/app/send/mobile"
+    }
+    ToQR = async()=>{
+      window.location.href="/app/user/qr/"
+    }
+
+    render() {
+    
+      const {FirstName,LastName,BankID}=this.state.UserDetails 
+      const {isProfileImageUploded,imgPath,isLoggedIn,Time,featureTriggered,currentImage}=this.state 
+      if(isLoggedIn && Time===3)
+      {
+      return (
+        <div className="app-container">
+          <header className="header">
+            <div>
+              <div className="userInfoDisplyContainer">
+                {isProfileImageUploded?<img className="profilePhoto" src={imgPath} alt="Profile"/>:<h1 className="profileIcon">{LastName[0]}</h1>}  
+                <div className="userDetailsContainer">
+                   <h1 className="userName">{LastName+FirstName} </h1>
+                   <p>{BankID}</p>  
+                </div>
+                </div>
+            </div>
+              
+            <nav className="nav-menu">
+              <a href="/app/user/profile">Profile</a>
+              <a href="#">Settings</a>
+              <a ><button className="logout-btn" onClick={()=>{isLoggedIn?window.location.href="/app/user/logout":null;}}>Logout</button></a>
+            </nav>
+          </header>
+          <hr/>
+          <div className="search-bar">
+              <input className="nav-search" placeholder="🔍 Pay Friends and Merchants"/>
+          </div>
+          <hr/>
+          <div className="Menu-Section">
+          <div className="grid-container">
+            {[
+              { label: "Scan QR", icon: "fa-solid fa-qrcode",Path:"",onclickFunction:this.ToQR},
+              { label: "Pay Phone", icon: "fa-solid fa-phone",Path:"",onclickFunction:this.ToMobile},
+              { label: "Bank Transfer", icon: "fa-solid fa-university",Path:"",onclickFunction:this.checkBalance},
+              { label: "UPI ID", icon: "fa-solid fa-id-card",Path:"",onclickFunction:this.checkBalance},
+              { label: "Transaction History", icon: "fa-solid fa-code-compare",Path:"",onclickFunction:this.checkTransactionHistory},
+              { label: "Check Balance", icon: "fa-solid fa-mobile-alt",Path:"/app/user/check/balance",onclickFunction:this.checkBalance},
+            ].map((item) => {
+              let URL 
+              if(item.Path!=""){
+                URL=item.Path
+              } 
+              else{
+                URL="#"
+              }
+              return (
+              <div className="grid-item" key={item.label}>
+                <a><i onClick={() => item.onclickFunction(item.Path)} className={`${item.icon} icon-shadow`}></i></a>
+                <br/>
+                <span className="Transfer-Type-Label">{item.label}</span>
+              </div>
+            )})}
+          </div>
+          
+          <div className="images-container">
+            <img  className="carouselImage" src={currentImage}/>
+            </div>
+          
+          </div>
+          
+          <div className="section-title">Bills & Recharges</div>
+          <div className="grid-container">
+            {[
+              { label: "DTH", icon: "fa-solid fa-tv" },
+              { label: "Electricity", icon: "fa-solid fa-bolt" },
+              { label: "Google Play", icon: "fa-brands fa-google-play" },
+            ].map((item) => (
+              <div className="grid-item" key={item.label}>
+                <i className={item.icon}></i>
+                <span>{item.label}</span>
+              </div>
+            ))}
+          </div>
+          <div className="invite-section">
+            <h3>Invite Friends & Get ₹51</h3>
+            <button className="invite-btn">Invite</button>
+          </div>
+        </div>
+      );
+      }
+      // else if(isLoggedIn && Time===3 && featureTriggered){
+      //                 return <this.UpiPinEntry />
+      // }
+      else{
+        return (
+    <div class="main-loader-container">
+    <div class="loader"></div>
+    </div>
+        )
+      }
+  } 
+}
+  ReactDOM.render(<window.UpiPaymentApp />, document.getElementById("root"));
+  </script>
+</body>
+</html>

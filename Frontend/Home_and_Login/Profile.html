@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+ 
+</head>
+<style>
+     .main-loader-container {
+            display: flex;
+            flex-direction:column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #060505;
+            margin: 0;
+        }
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-top-color:rgb(142, 194, 255);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+</style>
+<body>
+
+<div id="root"></div>
+
+<script type="text/babel">
+class ProfilePage extends React.Component {
+    state={
+        UserDetails:{},
+        isLoggedIn:false,
+        time:0,
+    }
+    getInitials(name) {
+        return name.split(" ").map(word => word[0]).join("").slice(0, 2).toUpperCase();
+    }
+
+    componentDidMount(){
+            const Path = "/app/user/get/details"
+            const Options = {
+              method:"GET"
+            }
+            fetch(Path,Options)
+            .then(res=>{
+              if(res.status===200){
+                return res.json()
+              }
+              if(res.status===404){
+                window.location.href="/app/unAuthorized"
+              }
+              else{
+                throw new Error("Server Down")
+              }
+            })
+            .then(Data=>{
+              const User = Data.userData
+              let interval
+              console.log("Got Data: ",User[0])
+              //this.setState({UserDetails:User[0],isLoggedIn:true,time:3})
+              interval = setInterval(() => {
+                }, 2000);
+                
+                setTimeout(() => {
+                    clearInterval(interval);
+                    this.setState({UserDetails:User[0],isLoggedIn:true,time:3})
+                    console.log("Stopped");
+                }, 1500);
+              
+            })
+            .catch(err=>{
+              console.log("Err : \n",err)
+            })
+          }
+    
+    render() {
+         const user=this.state.UserDetails
+         const{isLoggedIn,time}=this.state 
+        if(time===3){ 
+        return (
+            <div className="container">
+                <div className="profile-header">
+                    <div className="profile-avatar">{this.getInitials(user.FirstName + " " + user.LastName)}</div>
+                    <div className="profile-name">{user.FirstName} {user.LastName}</div>
+                    <div className="profile-subtitle">{user.BankID}</div>
+                </div>
+
+                <h3>Profile Details</h3>
+                <div className="profile-details">
+                    <div className="detail-row">
+                        <DetailItem label="Age" value={user.Age} />
+                        <DetailItem label="City" value={user.City} />
+                    </div>
+                    <div className="detail-row">  
+                        <DetailItem label="Phone" value={user.PhoneNumber} />
+                    </div>
+                    <div className="detail-row">
+                        <DetailItem label="Bank Account" value={user.BankAccountNumber} />
+                        <DetailItem label="Bank" value={user.BankName} />
+                    </div>
+                    <div className="detail-row">
+                        <DetailItem label="IFSC" value={user.BankIFSC} />
+                        <DetailItem label="Branch" value={user.BankBranchLocation} />
+                    </div>
+                    <div className="detail-row">
+                        <DetailItem label="Aadhaar" value={user.AadhaarNumber} />
+                        <DetailItem label="PAN" value={user.PAN} />
+                    </div>
+                    <div className="detail-row">
+                        <DetailItem label="UPI" value={user.UpiCredentialNumber} />
+                    </div>
+                </div>
+
+                <div className="footer">🔵 Secure Banking</div>
+                <div className="footer">
+                <a className="Button" href="/user/application/open/"><button className="back-btn" state={{cursor:"pointer",}}>Back</button></a>    
+                </div>
+            </div>
+        )
+        }
+        else{
+            return (  <div class="main-loader-container">
+    <div class="loader"></div>
+    </div>
+              )
+        }
+    
+}
+}
+
+const DetailItem = ({ label, value }) => (
+    <div className="detail-item">
+        <span className="detail-label">{label}</span>
+        <span className="detail-value">{value}</span>
+    </div>
+);
+
+const styles = document.createElement("style");
+styles.innerHTML = `
+         body {
+            font-family: monospace !important;
+            margin: 0;
+            padding: 0;
+            background-color: #0a0a0a;
+            color: white;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: auto;
+            background: #161b22;
+            padding: 50px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            color: white;
+        }
+        .profile-header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #30363d;
+            margin-bottom: 20px;
+        }
+        .profile-subtitle{
+            color: rgb(63, 143, 111);
+            font-size: 18px;
+        }
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            background: #58a6ff;
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            margin: auto;
+        }
+        .profile-name {
+            font-size: 32px;
+            font-weight: 600;
+            color: rgb(110, 161, 35);
+        }
+        .profile-details {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .detail-row {
+            display: flex;
+            gap: 10px;
+        }
+        .detail-item {
+            flex: 1;
+            background: #21262d;
+            padding: 12px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .detail-label {
+            font-size: 18px;
+            color: rgb(157, 184, 173);
+        }
+        .detail-value {
+            font-weight: bold;
+            font-size: 20px;
+        }
+        .footer {
+            font-size: 20px;
+            text-align: center;
+            margin: 20px;
+        }
+        .back-btn {
+            background-color: rgb(94, 175, 143);
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            height: 40px;
+            width: 110px;
+            border: none;
+            border-radius: 10px;
+            margin-top: 20px;
+            box-shadow: 1px 2px 5px rgba(94, 110, 100, 0.5);
+        }
+        @media (max-width: 768px) {
+            .detail-row {
+                flex-direction: column;
+            }
+        }
+        .dots {
+            font-size: 29px !important;
+        }
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px !important;
+        }
+        .message {
+            margin-top: 15%;
+        }
+        @keyframes dots {
+            0% { content: "🕑"; }
+            33% { content: "🕓🕕"; }
+            66% { content: "🕖🕗🕛"; }
+            100% { content: ""; }
+        }
+        .dots::after {
+            content: "";
+            animation: dots 2s steps(4, end) infinite;
+        }
+
+`;
+document.head.appendChild(styles);
+
+ReactDOM.render(<ProfilePage />, document.getElementById("root"));
+
+</script>
+
+<style>
+    .colors{
+        color:rgb(94, 175, 143);
+    }
+</style>
+
+</body>
+</html>
